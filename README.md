@@ -7,3 +7,5 @@ This app is a sudoku solver that will take an incomplete sukdoku board and find 
 
 The program finds the solution to a sudoku board through the use of a modified backtracking algorithm.  It recursively searches through valid board configurations until a complete, valid board is found.
 
+Note: this repository only contains the .xml and .java files for this app.  It could not be run as is.
+
