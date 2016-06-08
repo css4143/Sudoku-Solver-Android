@@ -8,16 +8,10 @@ package com.example.cseiden.sudokuui;
  * Design:
  *
  * @author Connor Seiden
- * @version 2-24-2015
+ * @version 6-7-2016
  *
  */
 public class Solver {
-
-    /**
-     * constructor
-     */
-    public Solver(){
-    }
 
     /**
      * The method that is to be called in order to find the solution to the
@@ -27,7 +21,10 @@ public class Solver {
      * @param b			The original board configuration that is to be solved
      * @return			The solved board configuration or null if there is none
      */
-    public Board solution(Board b){
+    public static Board solution(Board b){
+        if(!InitChecker.check(b)){
+            return null;
+        }
         if(b.get(0, 0)==0){
             return solve(b,0,0);
         }
@@ -62,7 +59,7 @@ public class Solver {
      * @param y		The current y coordinate being modified
      * @return		The solved board configuration or null if none exists.
      */
-    private Board solve(Board b, int x, int y){
+    private static Board solve(Board b, int x, int y){
         if(y==9){
             return b;
         }
@@ -85,70 +82,24 @@ public class Solver {
     /**
      * getSuccessors takes a current spot and finds all valid number placements
      * for that spot on the board.  It creates a different board for each valid
-     * configuration and returns an array of these boards.
-     *
-     * Design:  For the spot currently being looked at -> get the three lists of
-     * row, col, and sqr. Two ways to handle checking for which values are valid
-     * for that spot.  Loop from 1 to 9 and see if all the 3 arrays do not
-     * contain that number (advantage: as soon as one list contains the element
-     * the rest don't have to be checked).
-     * Time complexity: (O 3n^2)
-     *
-     * The other way is to make a list of size 10 (iCheck) and go through each
-     * list once and increment the index of iCheck that is the number at the
-     * spot on the list we are looping through.  When all three lists are done,
-     * go through iCheck and any place that is zero, the index of that spot is a
-     * valid number for the successor at the current spot being looked at.
-     * Time complexity: (O 4n)
-     *
-     * In this case, n will always be 9, but the second method is still faster.
-     *
-     * The second method will be implemented due to increased efficiency and
-     * overall readability.
-     *
-     * The last for-loop populates successors from right to left.
+     * configuration and returns an array of these boards, or null if there are
+     * no valid configurations.  It does this by using the getValid() method of
+     * the board.
      *
      * @param b		The board that is going to be modified
      * @param x		The current x-coordinate to be modified
      * @param y		The current y-coordinate to be modified
-     * @return		A list of valid board arrangements
+     * @return		A list of valid board arrangements, or null if there are none
      */
-    private Board[] getSuccessors(Board b, int x, int y){
-        int counter[] = new int[10];
-        for(int i=0;i<10;i++){ counter[i] = 0; }
-        int temp[];
+    private static Board[] getSuccessors(Board b, int x, int y){
+        int[] valids = b.getValids(x, y);
 
-        //check current column for valid placements
-        temp = b.getCol(x);
-        for(int i=0;i<9;i++){
-            counter[temp[i]]++;
-        }
+        if(valids == null){ return null; }
+        Board[] successors = new Board[valids.length];
 
-        //check current row for valid placements
-        temp = b.getRow(y);
-        for(int i=0;i<9;i++){
-            counter[temp[i]]++;
-        }
-
-        //check current 3x3 square for valid placements
-        temp = b.getSqr(x, y);
-        for(int i=0;i<9;i++){
-            counter[temp[i]]++;
-        }
-
-        int sCount = 0;
-        for(int i=0;i<10;i++){
-            if(counter[i]==0){ sCount++; }
-        }
-        if(sCount==0){ return null; }
-        Board[] successors = new Board[sCount];
-
-        for(int i=0;i<10;i++){
-            if(counter[i]==0){
-                successors[sCount-1] = new Board(b);
-                successors[sCount-1].put(i, x, y);
-                sCount--;
-            }
+        for(int i=0;i<valids.length;i++){
+            successors[i] = new Board(b);
+            successors[i].put(valids[i], x, y);
         }
 
         return successors;
@@ -168,7 +119,7 @@ public class Solver {
      * @return		An array of two elements that are the new x and y
      * 				coordinates respectively
      */
-    private int[] nextCoords(Board b, int x, int y){
+    private static int[] nextCoords(Board b, int x, int y){
         int tx = x;
         int ty = y;
         boolean found = false;
