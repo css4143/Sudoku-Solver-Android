@@ -14,7 +14,7 @@ import android.widget.Toast;
  * Main activity page for the Sudoku solver Android app.
  *
  * @author Connor Seiden
- * @version 6-3-2016
+ * @version 6-7-2016
  *
  */
 public class MainActivity extends AppCompatActivity {
@@ -145,9 +145,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Solver s = new Solver();
-
-        Board solved = s.solution(board);
+        Board solved = Solver.solution(board);
 
         if(solved == null){
             Toast.makeText(getApplicationContext(), "No Solution Exists", Toast.LENGTH_LONG).show();
@@ -176,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
             ((Button) board.findViewById(i)).setText(" ");
         }
     }
-
 
 
 }
