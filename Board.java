@@ -8,7 +8,7 @@ package com.example.cseiden.sudokuui;
  * third column is x-2, etc.  Same for the rows.
  *
  * @author Connor Seiden
- * @version 2-24-2015
+ * @version 6-7-2016
  *
  */
 public class Board {
@@ -114,7 +114,7 @@ public class Board {
         if(x<=2){ tx=0; }
         else if(x<=5){ tx=3; }
         else{ tx=6; }
-        //find y coodinate of current 3x3 board square
+        //find y coordinate of current 3x3 board square
         if(y<=2){ ty=0; }
         else if(y<=5){ ty=3; }
         else{ ty=6; }
@@ -123,6 +123,76 @@ public class Board {
                 board[tx+1][ty], board[tx+1][ty+1], board[tx+1][ty+2],
                 board[tx+2][ty], board[tx+2][ty+1], board[tx+2][ty+2]};
         return sqr;
+    }
+
+    /**
+     * This method takes a current space and finds all valid number placements
+     * for that space on the board.  It then returns these numbers in an array,
+     * or null if there are no valid number placements for this space.
+     *
+     * Design:  For the space currently being looked at -> get the three lists
+     * of row, col, and sqr. Two ways to handle checking for which values are
+     * valid for that spot.  Loop from 1 to 9 and see if all the 3 arrays do
+     * not contain that number (advantage: as soon as one list contains the
+     * element the rest don't have to be checked).
+     * Time complexity: (O 3n^2)
+     *
+     * The other way is to make a list of size 10 (counter) and go through each
+     * list once and increment the index of counter that is the number at the
+     * spot on the list we are looping through.  When all three lists are done,
+     * go through counter and any place that is zero, the index of that space
+     * is a valid number for the current space being looked at.
+     * Time complexity: (O 4n)
+     *
+     * In this case, n will always be 9, but the second method is still faster.
+     *
+     * The second method will be implemented due to increased efficiency and
+     * overall readability.
+     *
+     * The last for-loop populates valids from right to left.
+     *
+     * @param x		The current x-coordinate
+     * @param y		The current y-coordinate
+     * @return		An array containing all valid numbers for this space
+     */
+    public int[] getValids(int x, int y){
+        int counter[] = new int[10];
+        for(int i=0;i<10;i++){ counter[i] = 0; }
+        int temp[];
+
+        //check current column for valid placements
+        temp = getCol(x);
+        for(int i=0;i<9;i++){
+            counter[temp[i]]++;
+        }
+
+        //check current row for valid placements
+        temp = getRow(y);
+        for(int i=0;i<9;i++){
+            counter[temp[i]]++;
+        }
+
+        //check current 3x3 square for valid placements
+        temp = getSqr(x, y);
+        for(int i=0;i<9;i++){
+            counter[temp[i]]++;
+        }
+
+        int sCount = 0;
+        for(int i=1;i<10;i++){
+            if(counter[i]==0){ sCount++; }
+        }
+        if(sCount==0){ return null; }
+        int[] valids = new int[sCount];
+
+        for(int i=1;i<10;i++){
+            if(counter[i]==0){
+                valids[sCount-1] = i;
+                sCount--;
+            }
+        }
+
+        return valids;
     }
 
     /**
